@@ -1,18 +1,26 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import axios from 'axios';
 
 export const pixabayApi = createApi({
   reducerPath: 'pixabayApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://pixabay.com/api/' }),
+  baseQuery: async ({ url, params }: { url: string, params: any }) => {
+    try {
+      const response = await axios.get(url, { params });
+      return { data: response.data }; 
+    } catch (error) {
+      return { error }; 
+    }
+  },
   endpoints: (builder) => ({
     getImages: builder.query({
       query: ({ query, page = 1, perPage = 20 }) => ({
-        url: '',
+        url: 'https://pixabay.com/api/', 
         params: {
-          key: '47108952-bc71d47210c5897e4b2251e5a', // Replace with your actual API key
+          key: '47108952-bc71d47210c5897e4b2251e5a', 
           q: query,
           page,
           per_page: perPage,
-          image_type: 'photo',
+          image_type: 'photo', 
         },
       }),
     }),
@@ -20,4 +28,3 @@ export const pixabayApi = createApi({
 });
 
 export const { useGetImagesQuery } = pixabayApi;
-

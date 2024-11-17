@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useGetImagesQuery } from '../../api/pixabayApi';
 import BookmarkButton from '../../components/ui/BookmarkButton';
+import SearchBar from '../../components/ui/SearchBar'
 import { useFonts } from 'expo-font'; // Use the hook from expo-font
 
 const Home = () => {
@@ -80,15 +81,11 @@ const Home = () => {
   return (
     <View className="flex-1 bg-white">
       {/* Sticky Pencarian */}
-      <View className="sticky top-0 text-slate-700 bg-white shadow-md p-4 z-10">
-        <TextInput
-          placeholder="Cari gambar..."
-          value={searchTerm}
-          onChangeText={(text) => setSearchTerm(text)}
-          onSubmitEditing={handleSearch}
-          className="font-minimo border-b border-lime-100 text-slate-700 rounded-lg p-3 w-full"
-        />
-      </View>
+      <SearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        handleSearch={handleSearch}
+      />
 
       {/* Infinite Scroll */}
       {isLoading && page === 1 ? (

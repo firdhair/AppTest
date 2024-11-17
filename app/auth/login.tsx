@@ -11,13 +11,12 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const handleLogin = () => {
-    // Mock validation for username and password
     if (username === 'admin' && password === 'admin') {
-      const token = '47108952-bc71d47210c5897e4b2251e5a'; // Replace with real token from the API server
+      const token = 'xxxxxxxxxx'; 
       dispatch(setToken(token));
-      router.replace('/(tabs)'); // Redirect to Home page
+      router.replace('/(tabs)'); 
     } else {
-      Alert.alert('Login Failed', 'Invalid username or password.');
+      Alert.alert('Login Gagal', 'Masukkan username atau password.');
     }
   };
 

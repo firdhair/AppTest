@@ -1,25 +1,41 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+// redux/authSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const storeTokenInAsyncStorage = createAsyncThunk(
+  'auth/storeToken',
+  async (token: string) => {
+    await AsyncStorage.setItem('authToken', token);
+    return token;
+  }
+);
 
 interface AuthState {
-  token: string | null;
+  token: string | null;  
 }
 
 const initialState: AuthState = {
-  token: null,
+  token: null,  
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
+    setToken: (state, action) => {
+      state.token = action.payload;  
     },
-    logout: (state) => {
-      state.token = null;
+    clearToken: (state) => {
+      state.token = null;  
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(storeTokenInAsyncStorage.fulfilled, (state, action) => {
+      state.token = action.payload; 
+    });
   },
 });
 
-export const { setToken, logout } = authSlice.actions;
+export const { setToken, clearToken } = authSlice.actions;
+
 export default authSlice.reducer;

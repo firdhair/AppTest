@@ -2,21 +2,26 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useGetImagesQuery } from '../../api/pixabayApi';
 import BookmarkButton from '../../components/ui/BookmarkButton';
+import { useFonts } from 'expo-font'; // Use the hook from expo-font
 
 const Home = () => {
   const [page, setPage] = useState(1);
-  const [images, setImages] = useState<any[]>([]); 
+  const [images, setImages] = useState<any[]>([]);
   const [query, setQuery] = useState('nature');
-  const [searchTerm, setSearchTerm] = useState(''); 
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data, error, isLoading, isFetching } = useGetImagesQuery({
     query,
     page,
   });
 
+  const [fontsLoaded] = useFonts({
+    'minimo': require('../../assets/fonts/Minimo.otf'),
+    'minimo-bold': require('../../assets/fonts/Minimo Bold.otf'),
+  });
+
   useEffect(() => {
     if (data?.hits?.length) {
-      console.log('hits baru:', data.hits); 
       setImages((prevImages) => [...prevImages, ...data.hits]);
     }
   }, [data]);
@@ -24,27 +29,31 @@ const Home = () => {
   const handleSearch = () => {
     if (searchTerm.trim().length > 0) {
       setQuery(searchTerm.trim());
-      setPage(1); 
-      setImages([]); 
+      setPage(1);
+      setImages([]);
     }
   };
 
-const renderItem = ({ item }: { item: any }) => {
-  console.log('Rendering item:', item); 
-  return (
-    <View className="p-4 border-b border-gray-200">
-      <Image
-        source={{uri:item.webformatURL}}
-        style={{width: 400, height: 400}}
-        resizeMode="cover"
-        onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)} 
-      />
-      <Text className="text-lg font-bold mt-2">vv: {item.user}</Text>
-      <Text className="text-gray-600">Tags: {item.tags}</Text>
-      <BookmarkButton imageId={item.id.toString()} />
-    </View>
-  );
-};
+  const renderItem = ({ item }: { item: any }) => {
+    return (
+      <View className="p-4 border-b border-gray-100 flex flex-row items-center">
+        <Image
+          source={{ uri: item.webformatURL }}
+          className="h-48 w-48 rounded-sm"
+          resizeMode="cover"
+          onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
+        />
+       <View className='flex'>
+        <Text className="font-minimo text-lime-500 mx-2 font-semibold mt-2 text-lg">Username:</Text>
+        <Text className="font-minimoBold text-zinc-700 mx-2 font-semibold">{item.user}</Text>
+        <Text className="font-minimo text-zinc-700 mx-2 font-semibold flex-wrap w-full">Tags: {item.tags}</Text>
+        <BookmarkButton imageId={item.id.toString()} />
+       </View>
+        {/* <Text className="text-gray-600">Tags: {item.tags}</Text>
+        <BookmarkButton imageId={item.id.toString()} /> */}
+      </View>
+    );
+  };
 
   const loadMoreData = useCallback(() => {
     if (!isFetching && data?.hits?.length) {
@@ -54,7 +63,7 @@ const renderItem = ({ item }: { item: any }) => {
 
   if (isLoading && page === 1) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -62,26 +71,26 @@ const renderItem = ({ item }: { item: any }) => {
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View className="flex-1 justify-center items-center bg-white">
         <Text className="text-red-500">Error ketika memproses gambar. Tolong coba kembali.</Text>
       </View>
     );
   }
 
- return (
+  return (
     <View className="flex-1 bg-white">
       {/* Sticky Pencarian */}
-      <View className="sticky top-0 bg-white shadow-md p-4 z-10">
+      <View className="sticky top-0 text-slate-700 bg-white shadow-md p-4 z-10">
         <TextInput
           placeholder="Cari gambar..."
           value={searchTerm}
           onChangeText={(text) => setSearchTerm(text)}
           onSubmitEditing={handleSearch}
-          className="border border-gray-300 rounded-lg p-3"
+          className="font-minimo border-b border-lime-100 text-slate-700 rounded-lg p-3 w-full"
         />
       </View>
 
-       {/* Infinite Scroll  */}
+      {/* Infinite Scroll */}
       {isLoading && page === 1 ? (
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" />
@@ -99,7 +108,7 @@ const renderItem = ({ item }: { item: any }) => {
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetching ? (
-              <View className="py-4">
+              <View className="py-4 flex justify-center items-center">
                 <ActivityIndicator size="small" />
               </View>
             ) : null
@@ -109,6 +118,5 @@ const renderItem = ({ item }: { item: any }) => {
     </View>
   );
 };
-
 
 export default Home;
